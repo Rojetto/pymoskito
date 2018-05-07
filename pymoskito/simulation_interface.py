@@ -561,8 +561,9 @@ class SimulatorInteractor(QObject):
             self._sim_data["results"].update(control_error=c_error.reshape(c_error.size, 1))
 
         if "Observer" in self._sim_data["results"]:
-            o_error = (self._get_result_by_name("Observer")
-                       - self._get_result_by_name("Solver"))
+            # Get as many components from the observer output as we have state dimensions
+            observer_state_components = self._get_result_by_name("Observer")[:, :(self._get_result_by_name("Solver").shape[1])]
+            o_error = (observer_state_components - self._get_result_by_name("Solver"))
             self._sim_data["results"].update(observer_error=o_error)
 
     def _get_result_by_name(self, name):
