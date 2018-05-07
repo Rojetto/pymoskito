@@ -819,8 +819,17 @@ class SimulationGui(QMainWindow):
             self.actSimulateAll.setDisabled(False)
 
     def _read_results(self):
+        t = self.currentDataset["results"]["time"]
         state = self.currentDataset["results"]["Solver"]
-        self.interpolator = interp1d(self.currentDataset["results"]["time"],
+
+        # If the simulation crashed during the first step we should still create a valid interpolator
+        if t.size == 1:
+            # Expand time vector with another value just so the interpolator can interpolate something
+            t = np.append(t, t[0] + 1)
+            # Hold the state
+            state = np.concatenate((state, state))
+
+        self.interpolator = interp1d(t,
                                      state,
                                      axis=0,
                                      bounds_error=False,
