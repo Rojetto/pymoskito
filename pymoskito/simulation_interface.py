@@ -557,7 +557,8 @@ class SimulatorInteractor(QObject):
                                     for idx in range(m_data.shape[1])]).T
             else:
                 raise ValueError("Unknown Trajectory Format.")
-            self._sim_data["results"].update(control_error=c_error)
+            # For consistency, reshape the 1D array to a 2D array (otherwise PlotAll post processing crashes)
+            self._sim_data["results"].update(control_error=c_error.reshape(c_error.size, 1))
 
         if "Observer" in self._sim_data["results"]:
             o_error = (self._get_result_by_name("Observer")
